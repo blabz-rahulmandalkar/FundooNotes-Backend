@@ -1,0 +1,25 @@
+{
+  "name": "fundoonotes-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/blabz-rahulmandalkar/FundooNotes-Backend.git"
+  },
+  "keywords": [
+    "npm"
+  ],
+  "author": "@rahulmandalkar",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/blabz-rahulmandalkar/FundooNotes-Backend/issues"
+  },
+  "homepage": "https://github.com/blabz-rahulmandalkar/FundooNotes-Backend#readme",
+  "dependencies": {
+    "express": "^4.16.3"
+  }
+}
