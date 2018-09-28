@@ -1,8 +1,12 @@
 
+const mongoose = require("mongoose");
+const bodyParser = require('body-parser');
+const NoteRepository = require('../repositories/NoteRepository');
+
 
 class NoteController {
     constructor() {
-
+        this.noteRepository = new NoteRepository();
     }
 
     async loginUser(req, res) {
@@ -22,46 +26,64 @@ class NoteController {
         res.json(item);
     }
 
-    async addNote(req,res){
-
+    async addNote(req, res) {
+        this.noteRepository.addNote(req.body,(code,response)=>{
+                res.status(code).json(response);
+        });
     }
 
     async getNotes(req, res) {
-        let item = [
-            {
-                id: 3456,
-                title: "NodeS Backend",
-                note: "Hello i statrted my first nodejs backend using mongodb",
-                isArchive: true,
-                isPinned: false,
-                color: "#f4f4f4"
-            },
-            {
-                id: 3457,
-                title: "NodeS Backend",
-                note: "Hello i statrted my first nodejs backend using mongodb",
-                isArchive: true,
-                isPinned: false,
-                color: "#f4f4f4"
-            },
-            {
-                id: 3458,
-                title: "NodeS Backend",
-                note: "Hello i statrted my first nodejs backend using mongodb",
-                isArchive: true,
-                isPinned: false,
-                color: "#f4f4f4"
-            },
-            {
-                id: 3459,
-                title: "NodeS Backend",
-                note: "Hello i statrted my first nodejs backend using mongodb",
-                isArchive: true,
-                isPinned: false,
-                color: "#f4f4f4"
-            },
-        ]
-        res.json(item);
+        this.noteRepository.getNotes("", (error, items) => {
+            var item = {
+                status: false,
+                message: '',
+                data: []
+            }
+            if (error) {
+                item.message = error.message;
+                res.status(404).json(item);
+            } else {
+                item.status = true;
+                item.message = 'Successfully retrived notes';
+                item.data = items
+                res.status(200).json(item);
+            }
+        })
+    }
+
+    async deleteAllNotes(req,res){
+        this.noteRepository.deleteAllNotes("userid",(error)=>{
+            var item = {
+                status: false,
+                message: '',
+            }
+            if(error){
+                item.message = error.message;
+                res.status(404).json(item);
+            }else{
+                item.status = true;
+                item.message = 'Successfully deleted all notes';
+                res.status(200).json(item);
+            }
+        })
+    }
+
+    async deleteNote(req,res){
+        const contact = req.params.contact;
+        this.noteRepository.deleteNote(contact,(error)=>{
+            var item = {
+                status: false,
+                message: '',
+            }
+            if(error){
+                item.message = error.message;
+                res.status(404).json(item);
+            }else{
+                item.status = true;
+                item.message = 'Successfully deleted note';
+                res.status(200).json(item);
+            }
+        })
     }
 }
 
