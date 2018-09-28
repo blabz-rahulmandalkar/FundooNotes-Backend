@@ -1,0 +1,4 @@
+{
+    "connectionString": "mongodb://localhost:27017/fundooNotes",
+    "secret": "rahulmandalkar431@gmail.com"
+}
