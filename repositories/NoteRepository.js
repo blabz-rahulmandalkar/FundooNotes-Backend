@@ -1,43 +1,52 @@
 const db = require('../helpers/db');
 const Note = db.Note;
+var ObjectId = require('mongodb').ObjectId;
 
 class NoteRepository {
 
     constructor() {}
 
-    getNotes(userId, callback) {
-        const query = Note.find().select('-hash');;
+    getNotes(req,res,callback) {
+        const response = { status:false,message:'',data:[]}
         console.log("====== Called Get Notes API   =======");
-
-        query.select('title note isPinned isArchive contact');
+        var userId = req.userId;
+        console.log("UserId"+userId);
+        var userObjectId = new ObjectId(userId);
+        const query = Note.find({user:userObjectId});
+        query.select('_id title note isPinned isArchive');
         query.exec((error, items) => {
-            callback(error, items);
+            if(error){
+                response.message = "Failed to load list";
+                callback(404,response);
+            }else{
+                response.status = true
+                response.message = "Successfully retrived notes";
+                response.data = items;
+                callback(200,response);
+            }
         })
     }
 
-    addNote(body,callback) {
+    addNote(req,res,callback) {
         const response = { status:false,message:''}
-        var note = new this.Note(body);
-        var query = Note.find({contact:note.contact});
+        var userId = req.userId;
+        console.log("UserId"+userId);
+        var userObjectId = new ObjectId(userId);
+        req.body.user = userObjectId;
+        console.log(req.body);
+        var note = new Note(req.body);
         console.log("====== Called Add Note API   =======");
-        query.count((error,count)=>{
-            if(count>0){
-                response.message = "Note with this contact is already present";
-                callback(208,response);
-            }else{
-                note.save(function (error, item) {
-                    if(error){
-                        response.message = error.message;
-                        callback(404,response);
-                    }else{
-                        response.status = true;
-                        response.message = "Note inserted succfully ";
-                        callback(200,response);
-                    }
-                })
-            }
-        })
-        
+        note.save(function (error, item) {
+                        if(error){
+                            response.message = error.message;
+                            callback(404,response);
+                        }else{
+
+                            response.status = true;
+                            response.message = "Note inserted succfully ";
+                            callback(200,response);
+                        }
+        }) 
     }
 
     deleteAllNotes(userId,callback){

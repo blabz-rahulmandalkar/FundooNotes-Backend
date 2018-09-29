@@ -2,12 +2,12 @@ const express = require('express');
 const path = require('path');
 const errorHandler = require('./helpers/error-handler');
 const config = require('./config.json');
-//const jwt = require('./helpers/jwt');
 const logger = require('morgan');
-const userController = require("./controllers/UserController");
 var bodyParser = require('body-parser');
-const NoteRoute = require('./routes/Note');
 const jwt = require('jsonwebtoken');
+
+const NoteRoute = require('./routes/Note');
+const UserRoute = require('./routes/User');
 
 //Main app
 const app = express();
@@ -24,34 +24,40 @@ app.set('views',path.join(__dirname,'views'))
 //API's
 app.use('/note',validateUser,NoteRoute);
 
-app.post("/login",(req,res)=> userController.login(req,res));
-
-app.post("/register",(req,res)=> userController.register(req,res));
-
+app.use('/user',UserRoute);
 
 app.get("/",(req,res)=> {
+  
     res.status(200).send("Welcome");
-    //res.render('index',{ title:'Google Keep Notes'});
 });
 
 function validateUser(req, res, next) { 
-    jwt.verify(req.headers.token, config.secret, function(err, decoded) {
-      if (err) {
-        res.json({status:false, message: err.message});
-      }else{
-        // add user id to request
-        req.body.id = decoded.id;
-        console.log("===== User Id ==="+decoded.id);
-       // res.json({status:true, message: "Done"});
-        next();
-      }
-    });  
+    var bearerHeader = req.headers['token'];
+    var token;
+    console.log("===== Token :  "+ bearerHeader +"  =====");
+    req.authenticated = false;
+    if (bearerHeader){
+        jwt.verify(bearerHeader, config.secret, function (err, decoded){
+            console.log("22222");
+            if (err){
+                console.log(err);
+                req.authenticated = false;
+                req.userId = null;
+                res.status(401).json({status:false,message:"Invalid authentication token provided."})
+                next();
+            } else {
+                console.log("33333");
+                console.log(decoded);
+                req.userId = decoded.sub;
+                req.authenticated = true;
+                next();
+            }
+        });
+    }else{
+      res.status(401).json({status:false,message:"Authentication token has not provided."})
+    }
 }
 
-
-
-
-//Listening on port
 app.listen(4000,()=>{
     console.log("Started Listening to port .. 27017 ");
 });

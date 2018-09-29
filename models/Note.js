@@ -7,7 +7,7 @@ const  NoteSchema = new Schema({
     note: { type: String, default: "" },
     isPinned: { type: Boolean, default: false },
     isArchive: { type: Boolean, default: false },
-    contact: { type: Number, default: "" },
+    user:{type:mongoose.Schema.Types.ObjectId, ref:'User'}
 }, {
         collection: 'Note'
     })

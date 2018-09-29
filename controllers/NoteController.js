@@ -27,27 +27,14 @@ class NoteController {
     }
 
     async addNote(req, res) {
-        this.noteRepository.addNote(req.body,(code,response)=>{
+        this.noteRepository.addNote(req,res,(code,response)=>{
                 res.status(code).json(response);
         });
     }
 
     async getNotes(req, res) {
-        this.noteRepository.getNotes("", (error, items) => {
-            var item = {
-                status: false,
-                message: '',
-                data: []
-            }
-            if (error) {
-                item.message = error.message;
-                res.status(404).json(item);
-            } else {
-                item.status = true;
-                item.message = 'Successfully retrived notes';
-                item.data = items
-                res.status(200).json(item);
-            }
+        this.noteRepository.getNotes(req,res,(code,response) => {
+            res.status(code).json(response);
         })
     }
 

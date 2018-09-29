@@ -7,7 +7,8 @@ const UserSchema = new Schema({
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
     mobile: {type:String, required:true},
-    createdDate: { type: Date, default: Date.now }
+    createdDate: { type: Date, default: Date.now },
+    notes:[{type:mongoose.Schema.Types.ObjectId, ref:'Note'}]
 }, {
     collection: 'User'
 })

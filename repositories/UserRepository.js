@@ -16,10 +16,7 @@ async function login({ email, password }) {
         const { hash, ...userWithoutHash } = user.toObject();
         const token = jwt.sign({ sub: user.id }, config.secret);
         console.log(userWithoutHash);
-        return {
-            ...userWithoutHash,
-            token
-        };
+        return {token};
     }
 }
 
