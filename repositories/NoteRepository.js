@@ -6,7 +6,7 @@ class NoteRepository {
 
     constructor() {}
 
-    getNotes(req,res,callback) {
+    async getNotes(req,res,callback) {
         const response = { status:false,message:'',data:[]}
         console.log("====== Called Get Notes API   =======");
         var userId = req.userId;
@@ -27,7 +27,31 @@ class NoteRepository {
         })
     }
 
-    addNote(req,res,callback) {
+    async getNote(req,res,callback) {
+        const response = { status:false,message:'',data:[]}
+        console.log("====== Called Get Notes API   =======");
+        var userId = req.userId;
+        console.log("UserId"+userId);
+        var userObjectId = new ObjectId(userId);
+        if(!req.params.id){
+            callback(404,{status:true,message:"Note id not found"});
+        }
+        const query = Note.findOne({user:userObjectId,_id:req.params.id});
+        query.select('_id title note isPinned isArchive');
+        query.exec((error, items) => {
+            if(error){
+                response.message = "Failed to load list";
+                callback(404,response);
+            }else{
+                response.status = true
+                response.message = "Successfully retrived notes";
+                response.data = items;
+                callback(200,response);
+            }
+        })
+    }
+
+    async addNote(req,res,callback) {
         const response = { status:false,message:''}
         var userId = req.userId;
         console.log("UserId"+userId);
@@ -49,18 +73,41 @@ class NoteRepository {
         }) 
     }
 
-    deleteAllNotes(userId,callback){
+   async deleteForeverNotes(req,res,callback){
         console.log("====== Called Delete All Notes API   =======");
+        var userId = req.userId;
+        console.log("UserId"+userId);
+        var userObjectId = new ObjectId(userId);
         Note.deleteMany({},(error)=>{
             callback(error);
         })
     }
 
-    deleteNote(contact,callback){
-        console.log("====== Called Delete All Notes API   =======");
-        Note.deleteOne({contact:contact},(error)=>{
-            callback(error);
-        })
+    async updateNote(req,res,callback){
+        console.log("====== Called Update Note API   =======");
+        let userId = req.userId
+        let userObjectId = new ObjectId(userId);
+        if(!req.params.id){
+            callback(404,{status:true,message:"Note id not found"})
+        }
+        console.log("Note ID: "+req.params.id);
+        Note.findOneAndUpdate({user:userObjectId,_id:req.params.id},req.body,(err,doc,res)=>{
+            if(err){
+                callback(404,{status:true,message:err.message})
+            }else{
+                callback(200,{status:true,message:"Successfully note updated"})
+            }
+        });
+    }
+
+    async deleteNote(userId,noteId){
+        console.log("====== Called Delete Note API   =======");
+        console.log('User ID: '+userId);
+        console.log('Note ID: '+noteId);
+        Note.deleteOne({user:new ObjectId(userId),_id:new ObjectId(noteId)},(error)=>{
+            if(error) throw error;
+            return;
+        });
     }
 }
 

@@ -22,9 +22,9 @@ app.set('view engine','ejs');
 app.set('views',path.join(__dirname,'views'))
 
 //API's
-app.use('/note',validateUser,NoteRoute);
+app.use('/notes',validateUser,NoteRoute);
 
-app.use('/user',UserRoute);
+app.use('/users',UserRoute);
 
 app.get("/",(req,res)=> {
   
