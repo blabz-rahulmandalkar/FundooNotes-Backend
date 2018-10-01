@@ -13,7 +13,7 @@ class NoteRepository {
         console.log("UserId"+userId);
         var userObjectId = new ObjectId(userId);
         const query = Note.find({user:userObjectId});
-        query.select('_id title note isPinned isArchive');
+        query.select('_id title note isPinned isArchive isDeleted editDate reminderDate createDate');
         query.exec((error, items) => {
             if(error){
                 response.message = "Failed to load list";
