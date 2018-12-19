@@ -1,0 +1,299 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "1.0.0",
+        "title": "FundooNotes",
+        "description": "NodeJS | MongoDB",
+        "license": {
+            "name": "MIT",
+            "url": "https://opensource.org/licenses/MIT"
+        }
+    },
+    "host": "192.168.0.57:4000",  
+    "basePath": "/api/",
+    "schemes": [
+        "http"
+    ],
+    "paths": {
+        "/users/register": {
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Sign-Up",
+                "parameters": [
+                    {
+                        "name": "firstName",
+                        "in": "formData",
+                        "type": "string",
+                        "required": true,
+                        "description": "First name"
+                    },
+                    {
+                        "name": "lastName",
+                        "in": "formData",
+                        "type": "string",
+                        "required": true,
+                        "description": "Last name"
+                    },
+                    {
+                        "name": "email",
+                        "in": "formData",
+                        "type": "string",
+                        "required": true,
+                        "description": "Email"
+                    },
+                    {
+                        "name": "mobile",
+                        "in": "formData",
+                        "type": "string",
+                        "required": true,
+                        "description": "Mobile number"
+                    },
+                    {
+                        "name": "password",
+                        "in": "formData",
+                        "type": "string",
+                        "required": true,
+                        "description": "Password"
+                    }
+                ],
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {}
+            }
+        },
+        "/users/login": {
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Sign-In",
+                "parameters": [
+                    {
+                        "name": "email",
+                        "in": "formData",
+                        "type": "string",
+                        "required": true,
+                        "description": "Email"
+                    },
+                    {
+                        "name": "password",
+                        "in": "formData",
+                        "type": "string",
+                        "required": true,
+                        "description": "Password"
+                    }
+                ],
+                "consumes": [
+                    "application/x-www-form-urlencoded"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {}
+            }
+        },
+        "/notes": {
+            "get": {
+                "tags": [
+                    "Note"
+                ],
+                "summary": "Get list of notes",
+                "parameters": [
+                    {
+                        "name": "token",
+                        "in": "header",
+                        "type": "string",
+                        "required": true,
+                        "description": "Authentication Token"
+                    }
+                ],
+
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {}
+            },
+            "post": {
+                "tags": [
+                    "Note"
+                ],
+                "summary": "Create new note",
+                "parameters": [
+                    {
+                        "name": "token",
+                        "in": "header",
+                        "type": "string",
+                        "required": true,
+                        "description": "Authentication Token"
+                    },
+                    {
+                        "name":"body",
+                        "in": "body",
+                        "required": false,
+                        "description": "Note Detail",
+                        "schema":{
+                            "$ref": "#/definitions/Note"
+                        }
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {}
+            }
+           
+        },
+        "/notes/{id}":{
+            "put": {
+                "tags": [
+                    "Note"
+                ],
+                "summary": "Update note",
+                "parameters": [
+                    {
+                        "name": "token",
+                        "in": "header",
+                        "type": "string",
+                        "required": true,
+                        "description": "Authentication Token"
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "type": "string",
+                        "required": true,
+                        "description": "Note Id"
+                    },
+                    {
+                        "name":"body",
+                        "in": "body",
+                        "required": false,
+                        "description": "Note Detail",
+                        "schema":{
+                            "$ref": "#/definitions/Note"
+                        }
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {}
+            },
+            "delete": {
+                "tags": [
+                    "Note"
+                ],
+                "summary": "Delete note",
+                "parameters": [
+                    {
+                        "name": "token",
+                        "in": "header",
+                        "type": "string",
+                        "required": true,
+                        "description": "Authentication Token"
+                    },
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "type": "string",
+                        "required": true,
+                        "description": "Note Id"
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {}
+            }
+        }
+    },
+    "definitions": {
+        "User": {
+            "required": [
+                "email",
+                "lastName",
+                "firstName",
+                "mobile"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string",
+                    "uniqueItems": true
+                },
+                "lastName": {
+                    "type": "string"
+                },
+                "firstName": {
+                    "type": "string"
+                },
+                "mobile": {
+                    "type": "string"
+                }
+            }
+        },
+        "Login": {
+            "required": [
+                "email",
+                "password"
+            ],
+            "properties": {
+                "email": {
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                }
+            }
+        },
+        "Note": {
+            "required": [
+               "note"
+            ],
+            "properties": {
+                "title": {
+                    "type": "string",
+                    "example:": "Welcome"
+                },
+                "note": {
+                    "type": "string",
+                    "example:": "This is first note"
+                },
+                "color": {
+                    "type": "string",
+                    "enum":[
+                        "#ffffff",
+                        "#fff000"
+                    ]
+                },
+                "isArchive": {
+                    "type": "boolean"
+                  
+                },
+                "isPinned": {
+                    "type": "boolean"
+                   
+                },
+                "isDeleted": {
+                    "type": "boolean"
+                  
+                },
+                "reminderDate":{
+                    "type": "string" 
+                }
+            }
+        },
+        "Users": {
+            "type": "array",
+            "$ref": "#/definitions/User"
+        },
+        "xml": {
+            "name": "Note"
+          }
+    }
+}

@@ -30,6 +30,6 @@ function register(req, res) {
         .catch(err => {
             console.log("=========== Register Error ======");
             console.error(err.message);
-            res.json({ status:false,message:'User is already taken with this email'});
+            res.json({ status:false,message:err.message});
         });
 }

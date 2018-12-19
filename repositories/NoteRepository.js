@@ -85,7 +85,7 @@ class NoteRepository {
 
     async updateNote(req,res,callback){
         console.log("====== Called Update Note API   =======");
-        let userId = req.userId
+        let userId = req.userId;
         let userObjectId = new ObjectId(userId);
         if(!req.params.id){
             callback(404,{status:true,message:"Note id not found"})
@@ -95,9 +95,10 @@ class NoteRepository {
             if(err){
                 callback(404,{status:true,message:err.message})
             }else{
-                callback(200,{status:true,message:"Successfully note updated"})
+                callback(200,{status:true,message:"Successfully note updated"}); 
             }
         });
+
     }
 
     async deleteNote(userId,noteId){

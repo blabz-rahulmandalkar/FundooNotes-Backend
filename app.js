@@ -9,24 +9,27 @@ const jwt = require('jsonwebtoken');
 const NoteRoute = require('./routes/Note');
 const UserRoute = require('./routes/User');
 
+var swaggerUi = require('swagger-ui-express'),
+    swaggerDocument = require('./swagger.json');
 //Main app
 const app = express();
 
 //App Configuration
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 app.use(logger("dev"));
 app.use(errorHandler);
 //app.use(jwt());
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(bodyParser.urlencoded({ extended: true }));
 app.set('view engine','ejs');
 app.set('views',path.join(__dirname,'views'))
 
 //API's
-app.use('/notes',validateUser,NoteRoute);
+app.use('/api/notes',validateUser,NoteRoute);
 
-app.use('/users',UserRoute);
+app.use('/api/users',UserRoute);
 
-app.get("/",(req,res)=> {
+app.get("/api",(req,res)=> {
   
     res.status(200).send("Welcome");
 });
