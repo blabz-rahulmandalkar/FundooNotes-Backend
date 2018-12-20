@@ -12,9 +12,10 @@ router.post("",(req,res)=> noteController.addNote(req,res));
 router.put("/deleteForeverNotes",(req,res)=> noteController.deleteForeverNotes(req,res));
 
 router.delete("/:id",(req,res)=> noteController.deleteNote(req,res));
+router.delete("",(req,res)=> noteController.deleteNotes(req,res));
+
 
 router.put("/:id",(req,res)=> noteController.updateNote(req,res));
-
 
 
 module.exports = router;

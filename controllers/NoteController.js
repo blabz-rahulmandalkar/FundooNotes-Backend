@@ -46,6 +46,12 @@ class NoteController {
         })
     }
 
+    async deleteNotes(req,res){
+        await this.noteRepository.deleteNotes(req,res,(code,response) => {
+            res.status(code).json(response);
+        })
+    }
+
     async updateNote(req,res){
         await this.noteRepository.updateNote(req,res,(code,response)=>{
             res.status(code).json(response);

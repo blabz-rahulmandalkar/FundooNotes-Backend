@@ -9,7 +9,7 @@
             "url": "https://opensource.org/licenses/MIT"
         }
     },
-    "host": "192.168.0.57:4000",  
+    "host": "192.168.0.191:4000",  
     "basePath": "/api/",
     "schemes": [
         "http"
@@ -139,6 +139,34 @@
                         "description": "Note Detail",
                         "schema":{
                             "$ref": "#/definitions/Note"
+                        }
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {}
+            },
+            "delete": {
+                "tags": [
+                    "Note"
+                ],
+                "summary": "Delete Multiple Notes",
+                "parameters": [
+                    {
+                        "name": "token",
+                        "in": "header",
+                        "type": "string",
+                        "required": true,
+                        "description": "Authentication Token"
+                    },
+                    {
+                        "name":"body",
+                        "in": "body",
+                        "required": false,
+                        "description": "Array of Notes Id",
+                        "schema":{
+                            "$ref":"#/definitions/NotesId"
                         }
                     }
                 ],
@@ -287,13 +315,21 @@
                     "type": "string" 
                 }
             }
+           
         },
-        "Users": {
-            "type": "array",
-            "$ref": "#/definitions/User"
+        "NotesId": {
+            "example":  
+                    [
+                        {
+                        "_id":"5c1a342eea8c3b0bbb811zf0"
+                    }
+                ]
+        
         },
         "xml": {
             "name": "Note"
-          }
+        }
+        
+        
     }
 }
