@@ -23,7 +23,7 @@ async function login({ email, password }) {
 async function register(userParam) {
     // validate
     if (await User.findOne({ email: userParam.email })) {
-        throw 'Username "' + userParam.email + '" is already taken';
+        throw `Username ${userParam.email} is already taken`;
     }
 
     const user = new User(userParam);

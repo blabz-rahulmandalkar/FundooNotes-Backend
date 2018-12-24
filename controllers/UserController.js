@@ -29,7 +29,7 @@ function register(req, res) {
         .then(() => res.json({ status:true,message:'User has been register successfully'}))
         .catch(err => {
             console.log("=========== Register Error ======");
-            console.error(err.message);
-            res.json({ status:false,message:err.message});
+            console.error(err);
+            res.json({ status:false,message:err});
         });
 }

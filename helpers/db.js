@@ -3,7 +3,20 @@ const mongoose = require("mongoose");
 const config = require('../config.json');
 
  //Connect to Mongodb database
+ let connectionURL = "mongodb://fundoonotes:fundoonotes@431@ds139934.mlab.com:39934/fundoonotes";//process.env.MONGOLAB_URI;
+ console.log("MONGOLAB_URI: ",connectionURL);
  mongoose.connect(config.connectionString);
+ //mongoose.connect(connectionURL);
+
+
+ 
+
+
+
+
+
+
+
 
  //Get Mongoose to use the global promise library
  mongoose.Promise = global.Promise;

@@ -90,6 +90,7 @@ class NoteRepository {
         if (!req.params.id) {
             callback(404, { status: true, message: "Note id not found" })
         }
+        req.body.editDate = Date.now();
         console.log("Note ID: " + req.params.id);
         Note.findOneAndUpdate({ user: userObjectId, _id: req.params.id }, req.body, (err, doc, res) => {
             if (err) {

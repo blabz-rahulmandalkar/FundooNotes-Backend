@@ -9,7 +9,7 @@
             "url": "https://opensource.org/licenses/MIT"
         }
     },
-    "host": "192.168.0.191:4000",  
+    "host": "192.168.0.75:4000",  
     "basePath": "/api/",
     "schemes": [
         "http"
