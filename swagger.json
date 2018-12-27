@@ -9,7 +9,7 @@
             "url": "https://opensource.org/licenses/MIT"
         }
     },
-    "host": "localhost:4000",  
+    "host":"https://fundoonotes-backend.herokuapp.com",
     "basePath": "/api/",
     "schemes": [
         "http"

@@ -34,6 +34,7 @@ app.get("/api",(req,res)=> {
     res.status(200).send("Welcome");
 });
 
+
 function validateUser(req, res, next) { 
     var bearerHeader = req.headers['token'];
     var token;
