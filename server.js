@@ -5,6 +5,7 @@ const config = require('./config.json');
 const logger = require('morgan');
 var bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
+const PORT = process.env.PORT || 4000
 
 const NoteRoute = require('./routes/Note');
 const UserRoute = require('./routes/User');
@@ -62,8 +63,8 @@ function validateUser(req, res, next) {
     }
 }
 
-app.listen(4000,()=>{
-    console.log("Started Listening to port .. 27017 ");
+app.listen(PORT,()=>{
+    console.log(`Started Listening to port ${PORT}`);
 });
 
 
