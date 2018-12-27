@@ -12,7 +12,7 @@
     "host":"fundoonotes-backend.herokuapp.com",
     "basePath": "/api/",
     "schemes": [
-        "http"
+        "https"
     ],
     "paths": {
         "/users/register": {
