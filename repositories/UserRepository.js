@@ -7,7 +7,9 @@ const User = db.User;
 module.exports = {
     getById,
     login,
-    register
+    register,
+    registerDevice,
+    deregisterDevice
 };
 
 async function login({ email, password }) {
@@ -35,6 +37,30 @@ async function register(userParam) {
 
     // save user
     await user.save();
+}
+
+async function registerDevice(req, res, callback){
+    User.findByIdAndUpdate({ _id: req.userId }, req.body, (err, doc, res) => {
+        if (err) {
+            callback(404, { status: true, message: err.message })
+        } else {
+            callback(200, { status: true, message: "Successfully registered device" });
+        }
+    });
+}
+
+async function deregisterDevice(req, res, callback){
+    const body = {
+        deviceId:"",
+        deviceToken:""
+    }
+    User.findByIdAndUpdate({ _id: req.userId },body, (err, doc, res) => {
+        if (err) {
+            callback(404, { status: true, message: err.message })
+        } else {
+            callback(200, { status: true, message: "Successfully de-registered device" });
+        }
+    });
 }
 
 async function getById(id) {

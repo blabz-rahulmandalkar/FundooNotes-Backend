@@ -7,6 +7,8 @@ const UserSchema = new Schema({
     firstName: { type: String, required: true },
     lastName: { type: String, required: true },
     mobile: {type:String, required:true},
+    deviceId: {type:String, required:false,default:""},
+    deviceToken: {type:String, required:false,default:""},
     createdDate: { type: Date, default: Date.now },
     notes:[{type:mongoose.Schema.Types.ObjectId, ref:'Note'}]
 }, {

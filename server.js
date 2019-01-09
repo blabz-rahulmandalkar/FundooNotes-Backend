@@ -1,71 +1,41 @@
+const validateUser = require ('./helpers/validator');
 const express = require('express');
-const path = require('path');
-const errorHandler = require('./helpers/error-handler');
-const config = require('./config.json');
-const logger = require('morgan');
+const morgan = require('morgan');
 var bodyParser = require('body-parser');
-const jwt = require('jsonwebtoken');
-const PORT = process.env.PORT || 4000
+const swaggerUi = require('swagger-ui-express'),
+swaggerDocument = require('./swagger.json');
 
-const NoteRoute = require('./routes/Note');
-const UserRoute = require('./routes/User');
-
-var swaggerUi = require('swagger-ui-express'),
-    swaggerDocument = require('./swagger.json');
-//Main app
+//Create app using express
 const app = express();
+
+//Set PORT 
+const PORT = process.env.PORT || 4000
 
 //App Configuration
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-app.use(logger("dev"));
-app.use(errorHandler);
-//app.use(jwt());
+app.use(morgan("dev"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set('view engine','ejs');
-app.set('views',path.join(__dirname,'views'))
 
-//API's
-app.use('/api/notes',validateUser,NoteRoute);
+//Routes the API's
+app.use('/api/notes',validateUser,require('./routes/Note'));
 
-app.use('/api/users',UserRoute);
+app.use('/api/users/registerDevice',validateUser,require('./routes/User'));
 
-app.get("/api",(req,res)=> {
-  
-    res.status(200).send("Welcome");
-});
+app.use('/api/users/deregisterDevice',validateUser,require('./routes/User'));
 
+app.use('/api/users',require('./routes/User'));
 
-function validateUser(req, res, next) { 
-    var bearerHeader = req.headers['token'];
-    var token;
-    console.log("===== Token :  "+ bearerHeader +"  =====");
-    req.authenticated = false;
-    if (bearerHeader){
-        jwt.verify(bearerHeader, config.secret, function (err, decoded){
-            console.log("22222");
-            if (err){
-                console.log(err);
-                req.authenticated = false;
-                req.userId = null;
-                res.status(401).json({status:false,message:"Invalid authentication token provided."})
-                next();
-            } else {
-                console.log("33333");
-                console.log(decoded);
-                req.userId = decoded.sub;
-                req.authenticated = true;
-                next();
-            }
-        });
-    }else{
-      res.status(401).json({status:false,message:"Authentication token has not provided."})
-    }
-}
+app.get('*',(req,res)=>{
+    res.render('index',{title:"FundooNotes Backend"});
+})
 
+//Listen to port
 app.listen(PORT,()=>{
     console.log(`Started Listening to port ${PORT}`);
 });
+
 
 
 

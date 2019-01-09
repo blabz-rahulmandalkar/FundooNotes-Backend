@@ -1,8 +1,4 @@
-
-const mongoose = require("mongoose");
-const bodyParser = require('body-parser');
 const NoteRepository = require('../repositories/NoteRepository');
-
 
 class NoteController {
     constructor() {
@@ -11,19 +7,31 @@ class NoteController {
 
     async addNote(req, res) {
         await this.noteRepository.addNote(req,res,(code,response)=>{
-                res.status(code).json(response);
+            res.status(code).json(response);
         });
     }
 
-    async getNotes(req, res) {
+    async getAllNotes(req, res) {
        await this.noteRepository.getNotes(req,res,(code,response) => {
             res.status(code).json(response);
         })
     }
 
+    async getDashboardNotes(req, res) {
+        await this.noteRepository.getDashboardNotes(req,res,(code,response) => {
+             res.status(code).json(response);
+         })
+     }
+
+     async getArchiveNotes(req, res) {
+        await this.noteRepository.getArchiveNotes(req,res,(code,response) => {
+             res.status(code).json(response);
+         })
+     }
+
     async getNote(req, res) {
         await this.noteRepository.getNote(req,res,(code,response) => {
-             res.status(code).json(response);
+            res.status(code).json(response);
          })
      }
 

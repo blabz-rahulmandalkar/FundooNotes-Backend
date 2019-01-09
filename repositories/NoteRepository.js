@@ -1,74 +1,95 @@
 const db = require('../helpers/db');
 const Note = db.Note;
-var ObjectId = require('mongodb').ObjectId;
-
+const User = db.User;
+const ObjectId = require('mongodb').ObjectId;
+const Constant = require('../helpers/constant');
+const sendNotification = require('../firebase/send');
 class NoteRepository {
 
     constructor() { }
 
     async getNotes(req, res, callback) {
-        const response = { status: false, message: '', data: [] }
-        console.log("====== Called Get Notes API   =======");
-        var userId = req.userId;
-        console.log("UserId" + userId);
-        var userObjectId = new ObjectId(userId);
-        const query = Note.find({ user: userObjectId });
+        const query = Note.find({ user: new ObjectId(req.userId) });
         query.select('_id title note isPinned isArchive isDeleted editDate reminderDate createDate');
         query.exec((error, items) => {
             if (error) {
-                response.message = "Failed to load list";
-                callback(404, response);
+                callback(404, { status: false, message: Constant.MSG_FAILED_TO_LOAD });
             } else {
-                response.status = true
-                response.message = "Successfully retrived notes";
-                response.data = items;
-                callback(200, response);
+                if (items.length>0)
+                    callback(200,{ status: true, message: Constant.MSG_NOTES_AVAILABLE,data:items});
+                else
+                    callback(200,{ status: true, message: Constant.MSG_NOTES_NOT_AVAILABLE,data:items});
+            }
+        })
+    }
+    //Get Dashboard notes
+    async getDashboardNotes(req, res, callback) {
+        const query = Note.find({ user: new ObjectId(req.userId),isArchive:false,isDeleted:false });
+        query.select('_id title note isPinned isArchive isDeleted editDate reminderDate createDate');
+        query.exec((error, items) => {
+            if (error) {
+                callback(404, { status: false, message: Constant.MSG_FAILED_TO_LOAD });
+            } else {
+                if (items.length>0)
+                    callback(200,{ status: true, message: Constant.MSG_NOTES_AVAILABLE,data:items});
+                else
+                    callback(200,{ status: true, message: Constant.MSG_NOTES_NOT_AVAILABLE,data:items});
+            }
+        })
+    }
+
+     //Get Dashboard notes
+     async getArchiveNotes(req, res, callback) {
+        const query = Note.find({ user: new ObjectId(req.userId),isArchive:true,isDeleted:false });
+        query.select('_id title note isPinned isArchive isDeleted editDate reminderDate createDate');
+        query.exec((error, items) => {
+            if (error) {
+                callback(404, { status: false, message: Constant.MSG_FAILED_TO_LOAD });
+            } else {
+                if (items.length>0)
+                    callback(200,{ status: true, message: Constant.MSG_NOTES_AVAILABLE,data:items});
+                else
+                    callback(200,{ status: true, message: Constant.MSG_NOTES_NOT_AVAILABLE,data:items});
             }
         })
     }
 
     async getNote(req, res, callback) {
-        const response = { status: false, message: '', data: [] }
-        console.log("====== Called Get Notes API   =======");
-        var userId = req.userId;
-        console.log("UserId" + userId);
-        var userObjectId = new ObjectId(userId);
         if (!req.params.id) {
-            callback(404, { status: true, message: "Note id not found" });
+            callback(400, { status: true, message: Constant.MSG_ID_NOT_FOUND });   
         }
-        const query = Note.findOne({ user: userObjectId, _id: req.params.id });
-        query.select('_id title note isPinned isArchive');
-        query.exec((error, items) => {
+        const query = Note.findOne({ user: new ObjectId(req.userId), _id: req.params.id });
+        query.select('_id title note isPinned isArchive isDeleted editDate reminderDate createDate');
+        query.exec((error, item) => {
             if (error) {
-                response.message = "Failed to load list";
-                callback(404, response);
+                callback(404, { status: false, message: Constant.MSG_FAILED_TO_LOAD });
             } else {
-                response.status = true
-                response.message = "Successfully retrived notes";
-                response.data = items;
-                callback(200, response);
+                if(item)
+                    callback(200,{ status: true, message: Constant.MSG_NOTE_AVAILABLE,data:item});
+                else
+                    callback(200,{ status: false, message: Constant.MSG_NOTE_NOT_AVAILABLE});
             }
         })
     }
 
     async addNote(req, res, callback) {
-        const response = { status: false, message: '' }
-        var userId = req.userId;
-        console.log("UserId" + userId);
-        var userObjectId = new ObjectId(userId);
-        req.body.user = userObjectId;
-        console.log(req.body);
-        var note = new Note(req.body);
-        console.log("====== Called Add Note API   =======");
+        req.body.user = new ObjectId(req.userId);
+        const note = new Note(req.body);
         note.save(function (error, item) {
             if (error) {
-                response.message = error.message;
-                callback(404, response);
+                callback(404, { status: false, message: error.details[0].message });
             } else {
-
-                response.status = true;
-                response.message = "Note inserted succfully ";
-                callback(200, response);
+                User.findById(req.userId, function (err, user) { 
+                    if(err===null){
+                        if(user.deviceToken && user.deviceToken!==""){
+                            console.log("User has device token");
+                            sendNotification(user.deviceToken,item.title,item.note);
+                        }else{
+                            console.log("User has not device token");
+                        }
+                    }
+                });
+                callback(200, { status: true, message: Constant.MSG_SUCCESS_NOTE_ADDED,data: item});
             }
         })
     }
@@ -99,7 +120,6 @@ class NoteRepository {
                 callback(200, { status: true, message: "Successfully note updated" });
             }
         });
-
     }
 
     async deleteNote(userId, noteId) {

@@ -9,10 +9,10 @@
             "url": "https://opensource.org/licenses/MIT"
         }
     },
-    "host":"fundoonotes-backend.herokuapp.com",
+    "host": "localhost:4000",
     "basePath": "/api/",
     "schemes": [
-        "https"
+        "http"
     ],
     "paths": {
         "/users/register": {
@@ -67,6 +67,60 @@
                 "responses": {}
             }
         },
+        "/users/registerDevice": {
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Register device for push notification",
+                "parameters": [
+                    {
+                        "name": "token",
+                        "in": "header",
+                        "type": "string",
+                        "required": true,
+                        "description": "Authentication Token"
+                    },
+                    {
+                        "name": "body",
+                        "in": "body",
+                        "required": false,
+                        "description": "Device Details",
+                        "schema": {
+                            "example": {
+                                "deviceId":"",
+                                "deviceToken":""
+                            }
+                        }
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {}
+            }
+        },
+        "/users/deregisterDevice": {
+            "post": {
+                "tags": [
+                    "User"
+                ],
+                "summary": "Un-register device from push notification",
+                "parameters": [
+                    {
+                        "name": "token",
+                        "in": "header",
+                        "type": "string",
+                        "required": true,
+                        "description": "Authentication Token"
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {}
+            }
+        },
         "/users/login": {
             "post": {
                 "tags": [
@@ -98,6 +152,27 @@
                 "responses": {}
             }
         },
+        "/notes/archive": {
+            "get": {
+                "tags": [
+                    "Note"
+                ],
+                "summary": "Get list of archive notes",
+                "parameters": [
+                    {
+                        "name": "token",
+                        "in": "header",
+                        "type": "string",
+                        "required": true,
+                        "description": "Authentication Token"
+                    }
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {}
+            }
+        },
         "/notes": {
             "get": {
                 "tags": [
@@ -113,7 +188,25 @@
                         "description": "Authentication Token"
                     }
                 ],
-
+                "produces": [
+                    "application/json"
+                ],
+                "responses": {}
+            },
+            "get": {
+                "tags": [
+                    "Note"
+                ],
+                "summary": "Get list of notes",
+                "parameters": [
+                    {
+                        "name": "token",
+                        "in": "header",
+                        "type": "string",
+                        "required": true,
+                        "description": "Authentication Token"
+                    }
+                ],
                 "produces": [
                     "application/json"
                 ],
@@ -133,11 +226,11 @@
                         "description": "Authentication Token"
                     },
                     {
-                        "name":"body",
+                        "name": "body",
                         "in": "body",
                         "required": false,
                         "description": "Note Detail",
-                        "schema":{
+                        "schema": {
                             "$ref": "#/definitions/Note"
                         }
                     }
@@ -161,12 +254,12 @@
                         "description": "Authentication Token"
                     },
                     {
-                        "name":"body",
+                        "name": "body",
                         "in": "body",
                         "required": false,
                         "description": "Array of Notes Id",
-                        "schema":{
-                            "$ref":"#/definitions/NotesId"
+                        "schema": {
+                            "$ref": "#/definitions/NotesId"
                         }
                     }
                 ],
@@ -175,9 +268,8 @@
                 ],
                 "responses": {}
             }
-           
         },
-        "/notes/{id}":{
+        "/notes/{id}": {
             "put": {
                 "tags": [
                     "Note"
@@ -199,11 +291,11 @@
                         "description": "Note Id"
                     },
                     {
-                        "name":"body",
+                        "name": "body",
                         "in": "body",
                         "required": false,
                         "description": "Note Detail",
-                        "schema":{
+                        "schema": {
                             "$ref": "#/definitions/Note"
                         }
                     }
@@ -281,7 +373,7 @@
         },
         "Note": {
             "required": [
-               "note"
+                "note"
             ],
             "properties": {
                 "title": {
@@ -294,42 +386,34 @@
                 },
                 "color": {
                     "type": "string",
-                    "enum":[
+                    "enum": [
                         "#ffffff",
                         "#fff000"
                     ]
                 },
                 "isArchive": {
                     "type": "boolean"
-                  
                 },
                 "isPinned": {
                     "type": "boolean"
-                   
                 },
                 "isDeleted": {
                     "type": "boolean"
-                  
                 },
-                "reminderDate":{
-                    "type": "string" 
+                "reminderDate": {
+                    "type": "string"
                 }
             }
-           
         },
         "NotesId": {
-            "example":  
-                    [
-                        {
-                        "_id":"5c1a342eea8c3b0bbb811zf0"
-                    }
-                ]
-        
+            "example": [
+                {
+                    "_id": "5c1a342eea8c3b0bbb811zf0"
+                }
+            ]
         },
         "xml": {
             "name": "Note"
         }
-        
-        
     }
 }

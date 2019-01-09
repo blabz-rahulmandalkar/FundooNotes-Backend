@@ -2,7 +2,9 @@ const userRepository = require('../repositories/UserRepository');
 
 module.exports = {
     login,
-    register
+    register,
+    registerDevice,
+    deregisterDevice
 }
 
 function login(req,res) {
@@ -33,3 +35,16 @@ function register(req, res) {
             res.json({ status:false,message:err});
         });
 }
+
+function registerDevice(req, res) {
+    userRepository.registerDevice(req,res,(code,response) => {
+        res.status(code).json(response);
+    })
+}
+
+function deregisterDevice(req, res) {
+    userRepository.deregisterDevice(req,res,(code,response) => {
+        res.status(code).json(response);
+    })
+}
+
