@@ -1,11 +1,12 @@
 
 var admin = require("firebase-admin");
+const config = require('../config.json');
 
 var serviceAccount = require("../firebase/fundoonotes-f6d37-firebase-adminsdk-6f17x-d9137a7601.json");
 
 admin.initializeApp({
     credential: admin.credential.cert(serviceAccount),
-    databaseURL: "https://fundoonotes-f6d37.firebaseio.com"
+    databaseURL: config.firebaseDatabaseUrl
 });
 
 async function sendNotification(deviceToken, title, note) {

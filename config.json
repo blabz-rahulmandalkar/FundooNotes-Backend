@@ -2,5 +2,6 @@
     "connectionString": "mongodb://localhost:27017/fundooNotes",
     "secret": "rahulmandalkar431@gmail.com",
     "localURL":"localhost:4000",
-    "remoteURL":"fundoonotes-backend.herokuapp.com"
+    "remoteURL":"fundoonotes-backend.herokuapp.com",
+    "firebaseDatabaseUrl":"https://fundoonotes-f6d37.firebaseio.com"
 }
