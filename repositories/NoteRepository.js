@@ -9,8 +9,8 @@ class NoteRepository {
     constructor() { }
 
     async getNotes(req, res, callback) {
-        const query = Note.find({ user: new ObjectId(req.userId) });
-        query.select('_id title note isPinned isArchive isDeleted editDate reminderDate createDate');
+        const query = Note.find({ user: new ObjectId(req.userId) }).populate('user',['email']);
+        //query.select('_id title note isPinned isArchive isDeleted editDate reminderDate createDate');
         query.exec((error, items) => {
             if (error) {
                 callback(404, { status: false, message: Constant.MSG_FAILED_TO_LOAD });
@@ -38,9 +38,24 @@ class NoteRepository {
         })
     }
 
-     //Get Dashboard notes
+     //Get Archive notes
      async getArchiveNotes(req, res, callback) {
         const query = Note.find({ user: new ObjectId(req.userId),isArchive:true,isDeleted:false });
+        query.select('_id title note isPinned isArchive isDeleted editDate reminderDate createDate');
+        query.exec((error, items) => {
+            if (error) {
+                callback(404, { status: false, message: Constant.MSG_FAILED_TO_LOAD });
+            } else {
+                if (items.length>0)
+                    callback(200,{ status: true, message: Constant.MSG_NOTES_AVAILABLE,data:items});
+                else
+                    callback(200,{ status: true, message: Constant.MSG_NOTES_NOT_AVAILABLE,data:items});
+            }
+        })
+    }
+
+    async getTrashNotes(req, res, callback) {
+        const query = Note.find({ user: new ObjectId(req.userId),isDeleted:true });
         query.select('_id title note isPinned isArchive isDeleted editDate reminderDate createDate');
         query.exec((error, items) => {
             if (error) {
@@ -58,7 +73,7 @@ class NoteRepository {
         if (!req.params.id) {
             callback(400, { status: true, message: Constant.MSG_ID_NOT_FOUND });   
         }
-        const query = Note.findOne({ user: new ObjectId(req.userId), _id: req.params.id });
+        const query = Note.findOne({ user: new ObjectId(req.userId), _id: req.params.id })
         query.select('_id title note isPinned isArchive isDeleted editDate reminderDate createDate');
         query.exec((error, item) => {
             if (error) {
@@ -94,26 +109,45 @@ class NoteRepository {
         })
     }
 
-    async deleteForeverNotes(req, res, callback) {
-        console.log("====== Called Delete All Notes API   =======");
-        var userId = req.userId;
-        console.log("UserId" + userId);
-        var userObjectId = new ObjectId(userId);
-        Note.deleteMany({}, (error) => {
-            callback(error);
-        })
+    async deleteTrashNotes(req, res, callback) {
+        try {
+            var arr = JSON.stringify(req.body);
+            var jsonObj = JSON.parse(arr);
+            if (jsonObj instanceof Array) {
+                const ids = jsonObj.map((item)=>{ return ObjectId(item._id.toString())});
+                Note.deleteMany({user: new ObjectId(req.userId), _id: { $in :ids}}, (error) => {
+                    if (error)
+                        callback(400, { status: false, message: error.message }); 
+                    else
+                        callback(200, { status: false, message: "Notes are deleted from trash" }); 
+                });
+            } else {
+                callback(400, { status: false, message: "Invalid body!, make sure it is JSON array" })
+            }
+        } catch (error) {
+                callback(404, { status: false, message: error.message })
+        }
+    }
+
+    async deleteTrashNote(req, res, callback) {
+        if(!req.params.id){
+            return callback(400,{status:false,message:'Note ID not found'})
+        }
+        Note.deleteOne({ user: new ObjectId(req.userId), _id: new ObjectId(req.params.id) }, (error) => {
+            if(error){
+                callback(400,{status:false,message:error.message})
+            }else{
+               callback(200,{status:true,message:"Note is delete from trash"})
+            }
+        });
     }
 
     async updateNote(req, res, callback) {
-        console.log("====== Called Update Note API   =======");
-        let userId = req.userId;
-        let userObjectId = new ObjectId(userId);
         if (!req.params.id) {
             callback(404, { status: true, message: "Note id not found" })
         }
         req.body.editDate = Date.now();
-        console.log("Note ID: " + req.params.id);
-        Note.findOneAndUpdate({ user: userObjectId, _id: req.params.id }, req.body, (err, doc, res) => {
+        Note.findOneAndUpdate({ user: new ObjectId(req.userId), _id: req.params.id }, req.body, (err, doc) => {
             if (err) {
                 callback(404, { status: true, message: err.message })
             } else {
@@ -122,35 +156,35 @@ class NoteRepository {
         });
     }
 
-    async deleteNote(userId, noteId) {
-        console.log("====== Called Delete Note API   =======");
-        console.log('User ID: ' + userId);
-        console.log('Note ID: ' + noteId);
-        Note.deleteOne({ user: new ObjectId(userId), _id: new ObjectId(noteId) }, (error) => {
-            if (error) throw error;
-            return;
+    async deleteNote(req, res, callback) {
+        if (!req.params.id) {
+            callback(404, { status: true, message: "Note id not found" })
+        }
+        req.body.editDate = Date.now();
+        Note.findOneAndUpdate({ user: new ObjectId(req.userId), _id: req.params.id }, {$set:{isDeleted:true}}, {new:true}, (err, doc) => {
+            if (err) {
+                callback(404, { status: true, message: err.message })
+            } else {
+                callback(200, { status: true, message: "Note is deleted successfully" });
+            }
         });
     }
 
     async deleteNotes(req, res, callback) {
-        console.log("====== Called Delete Multiple Notes API   =======");
-        let userId = req.userId;
-        let userObjectId = new ObjectId(userId);
-        console.log("UserId: ",userObjectId);
         try {
             var arr = JSON.stringify(req.body);
             var jsonObj = JSON.parse(arr);
             if (jsonObj instanceof Array) {
                 const ids = jsonObj.map((item)=>{ return ObjectId(item._id.toString())});
-                console.log(ids);
-                Note.deleteMany({user: userObjectId, _id: { $in :ids}}, (error) => {
-                    if (error)
-                        callback(400, { status: false, message: error.message }); 
-                    else
-                        callback(200, { status: false, message: "Successfully notes are deleted." }); 
-                });
+                Note.updateMany({user: new ObjectId(req.userId), _id: { $in :ids}},{$set:{ isDeleted:true}}, {new:true}, (err, doc) => {
+                    if (err) {
+                        callback(404, { status: true, message: err.message })
+                    } else {
+                        callback(200, { status: true, message: "Notes are deleted successfully" });
+                    }
+                })
             } else {
-                callback(404, { status: false, message: "Invalid body!, make sure it is JSON array" })
+                callback(400, { status: false, message: "Invalid body!, make sure it is JSON array" })
             }
         } catch (error) {
                 callback(404, { status: false, message: error.message })

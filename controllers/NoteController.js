@@ -29,28 +29,34 @@ class NoteController {
          })
      }
 
+     async getTrashNotes(req, res) {
+        await this.noteRepository.getTrashNotes(req,res,(code,response) => {
+             res.status(code).json(response);
+         })
+     }
+
+    
     async getNote(req, res) {
         await this.noteRepository.getNote(req,res,(code,response) => {
             res.status(code).json(response);
          })
-     }
+    }
 
-    async deleteForeverNotes(req,res){
-        await this.noteRepository.deleteForeverNotes("userid",(error)=>{
-            
+     async deleteTrashNotes(req,res){
+        await this.noteRepository.deleteTrashNotes(req,res,(code,response) => {
+            res.status(code).json(response);
+        })
+    }
+
+    async deleteTrashNote(req,res){
+        await this.noteRepository.deleteTrashNote(req,res,(code,response) => {
+            res.status(code).json(response);
         })
     }
 
     async deleteNote(req,res){
-        let userId = req.userId;
-        let noteId = req.params.id;
-        if(!noteId){
-            res.status(404).json({status:false,message:"Note id not found"})
-        }
-        await this.noteRepository.deleteNote(userId,noteId).then(()=>{
-            res.status(200).json({status:true,message:"Note is deleted successfuly"})
-        }).catch( error =>{
-            res.status(404).json({status:false,message:error.message})
+        await this.noteRepository.deleteNote(req,res,(code,response) => {
+            res.status(code).json(response);
         })
     }
 
