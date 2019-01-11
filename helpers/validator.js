@@ -1,6 +1,8 @@
 const config = require('../config.json');
 const jwt = require('jsonwebtoken');
 const db = require('../helpers/db');
+const Joi = require('joi');
+
 const User = db.User;
 //Function to validate user
 async function validateUser(req, res, next) {
@@ -28,5 +30,3 @@ async function validateUser(req, res, next) {
 
 //Export all stuffs
 module.exports = validateUser
-
-
