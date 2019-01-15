@@ -58,26 +58,35 @@ async function register(req, res, callback) {
         mobile: Joi.string().regex(/^[0-9]{10}$/).required(),
         password: Joi.string().min(6).max(15).required(),
     });
-    await Joi.validate(req.body, userValidationSchema, function (err, value) {
+    Joi.validate(req.body, userValidationSchema, function (err, value) {
         if (err) {
             return callback(400, { status: false, message: err.message });
+        } else {
+            saveUser(req.body,(code,response)=>{
+                callback(code,response);
+            })
         }
     });
-    if (await User.findOne({ email: req.body.email })) {
-        return callback(400, { status: false, message: `Username ${req.body.email} is already taken` });
-    }
-    const user = new User(req.body);
-    // hash password
-    if (req.body.password) {
-        user.hash = bcrypt.hashSync(req.body.password, 10);
-    }
-    // save user
-    await user.save((err, value) => {
-        if (err) {
-            return callback(400, { status: true, message: err.message });
+
+}
+
+async function saveUser(body,callback){
+    if (await User.findOne({ email: body.email })) {
+        return callback(400, { status: false, message: `Username ${body.email} is already taken` });
+    } else {
+        const user = new User(body);
+        // hash password
+        if (body.password) {
+            user.hash = bcrypt.hashSync(body.password, 10);
         }
-        return callback(200, { status: true, message: Constant.MSG_REGISTERED_USER });
-    })
+        // save user
+        user.save((err, value) => {
+            if (err) {
+                return callback(400, { status: true, message: err.message });
+            }
+            return callback(200, { status: true, message: Constant.MSG_REGISTERED_USER });
+        })
+    }
 }
 
 async function registerDevice(req, res, callback) {
